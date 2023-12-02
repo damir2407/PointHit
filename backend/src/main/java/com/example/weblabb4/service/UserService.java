@@ -7,7 +7,6 @@ import com.example.weblabb4.exception.UserAlreadyExistException;
 import com.example.weblabb4.exception.UserNotFoundException;
 import com.example.weblabb4.repository.RoleRepo;
 import com.example.weblabb4.repository.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepo userRepo;
-    @Autowired
-    private RoleRepo roleRepo;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepo userRepo;
+    private final RoleRepo roleRepo;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepo userRepo, RoleRepo roleRepo, PasswordEncoder passwordEncoder) {
+        this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     public UserEntity saveUser(UserEntity userEntity) throws UserAlreadyExistException {
@@ -50,7 +52,9 @@ public class UserService {
             throw new UserNotFoundException("This user does not exist!");
         } else if (passwordEncoder.matches(password, userEntity.getPassword())) {
             return userEntity;
-        } else throw new UserNotFoundException("Incorrect username or password!");
+        } else {
+            throw new UserNotFoundException("Incorrect username or password!");
+        }
     }
 }
 

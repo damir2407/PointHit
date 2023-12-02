@@ -2,7 +2,6 @@ package com.example.weblabb4.service;
 
 import com.example.weblabb4.entity.PointEntity;
 import com.example.weblabb4.repository.PointRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -13,8 +12,11 @@ import java.util.List;
 @Service
 public class PointService {
 
-    @Autowired
-    private PointRepo pointRepo;
+    private final PointRepo pointRepo;
+
+    public PointService(PointRepo pointRepo) {
+        this.pointRepo = pointRepo;
+    }
 
 
     public PointEntity savePoint(PointEntity pointEntity) {

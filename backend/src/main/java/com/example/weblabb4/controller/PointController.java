@@ -10,36 +10,50 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/points")
+@RequestMapping(path = "/api/v1/points")
 @CrossOrigin(origins = "*")
 public class PointController {
 
-    @Autowired
-    private PointService pointService;
+    private final PointService pointService;
+    private final JwtProvider jwtProvider;
+    private final JwtFilter jwtFilter;
+    private final PointCreator pointCreator;
 
-    @Autowired
-    private JwtProvider jwtProvider;
+    public PointController(
+        PointService pointService,
+        JwtProvider jwtProvider,
+        JwtFilter jwtFilter,
+        PointCreator pointCreator
+    ) {
+        this.pointService = pointService;
+        this.jwtProvider = jwtProvider;
+        this.jwtFilter = jwtFilter;
+        this.pointCreator = pointCreator;
+    }
 
-    @Autowired
-    private JwtFilter jwtFilter;
-
-    @Autowired
-    private PointCreator pointCreator;
-
-    @PostMapping("/add")
-    public ResponseEntity<String> addPoint(@Valid @RequestBody PointRequest pointRequest, BindingResult bindingResult, HttpServletRequest httpServletRequest) {
+    @PostMapping
+    public ResponseEntity<String> addPoint(
+        @Valid @RequestBody PointRequest pointRequest,
+        BindingResult bindingResult,
+        HttpServletRequest httpServletRequest
+    ) {
 
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
@@ -71,7 +85,7 @@ public class PointController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping("/get")
+    @GetMapping
     private ResponseEntity<Object> getPoints(HttpServletRequest httpServletRequest) {
         try {
             String username = jwtProvider.getUsernameFromToken(jwtFilter.getTokenFromRequest(httpServletRequest));
@@ -89,7 +103,7 @@ public class PointController {
         }
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     private ResponseEntity<Object> deletePoints(HttpServletRequest httpServletRequest) {
         try {
             String username = jwtProvider.getUsernameFromToken(jwtFilter.getTokenFromRequest(httpServletRequest));
