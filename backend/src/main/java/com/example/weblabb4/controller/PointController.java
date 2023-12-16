@@ -16,8 +16,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(path = "/api/v1/points")
-@CrossOrigin(origins = "*")
+@Validated
 public class PointController {
 
     private final PointService pointService;
@@ -49,8 +49,7 @@ public class PointController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addPoint(
-        @Valid @RequestBody PointRequest pointRequest,
+    public ResponseEntity<String> addPoint(@RequestBody PointRequest pointRequest,
         BindingResult bindingResult,
         HttpServletRequest httpServletRequest
     ) {
