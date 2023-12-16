@@ -10,18 +10,18 @@ import com.example.weblabb4.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-
-import javax.validation.Valid;
 import java.util.List;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "*")
+
 @RequestMapping(path = "/api/v1/users/")
 @RestController
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<String> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
+    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest,
         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
@@ -57,7 +57,7 @@ public class UserController {
 
 
     @PostMapping("/auth")
-    public ResponseEntity<String> auth(@Valid @RequestBody AuthRequest authRequest, BindingResult bindingResult) {
+    public ResponseEntity<String> auth(@RequestBody AuthRequest authRequest, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
