@@ -1,6 +1,12 @@
 package com.example.weblabb4.config.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -22,22 +28,20 @@ public class JwtProvider {
     /**
      * signWith — принимает на вход алгоритм подписи и кодовое слово, которое потом потребуется для расшифровки.
      *
-     * @param username
      * @return токен
      */
     public String generateToken(String username) {
         Date date = Date.from(LocalDate.now().plusDays(15).atStartOfDay(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
-                .setSubject(username)
-                .setExpiration(date)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
+            .setSubject(username)
+            .setExpiration(date)
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact();
     }
 
     /**
      * для валидации поступающего токена
      *
-     * @param token
      * @return bool
      */
     public boolean validateToken(String token) {

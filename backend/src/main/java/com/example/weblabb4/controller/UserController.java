@@ -7,28 +7,34 @@ import com.example.weblabb4.exception.UserNotFoundException;
 import com.example.weblabb4.requests.AuthRequest;
 import com.example.weblabb4.requests.RegistrationRequest;
 import com.example.weblabb4.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*")
-@RequestMapping(path = "/user")
+@RequestMapping(path = "/api/v1/users/")
 @RestController
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final JwtProvider jwtProvider;
 
-    @Autowired
-    private JwtProvider jwtProvider;
+    public UserController(UserService userService, JwtProvider jwtProvider) {
+        this.userService = userService;
+        this.jwtProvider = jwtProvider;
+    }
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest, BindingResult bindingResult) {
+    @PostMapping
+    public ResponseEntity<String> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
+        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<FieldError> errors = bindingResult.getFieldErrors();
             String errorMessage = "";
@@ -37,7 +43,6 @@ public class UserController {
             }
             return ResponseEntity.badRequest().body(errorMessage);
         }
-
 
         UserEntity user = new UserEntity();
         user.setPassword(registrationRequest.getPassword());
@@ -64,7 +69,8 @@ public class UserController {
         }
 
         try {
-            UserEntity userEntity = userService.findByUsernameAndPassword(authRequest.getUsername(), authRequest.getPassword());
+            UserEntity userEntity = userService.findByUsernameAndPassword(authRequest.getUsername(),
+                authRequest.getPassword());
             String token = jwtProvider.generateToken(userEntity.getUsername());
             return ResponseEntity.ok(token);
         } catch (UserNotFoundException exception) {
