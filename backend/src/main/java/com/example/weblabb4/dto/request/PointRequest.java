@@ -1,8 +1,9 @@
-package com.example.weblabb4.requests;
+package com.example.weblabb4.dto.request;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,18 +11,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PointRequest {
 
-    @NotBlank(message = "X coordinate can't be NULL")
+    @NotNull(message = "X coordinate can't be NULL")
     @Min(value = -4, message = "X coordinate must be between [-4;4]")
     @Max(value = 4, message = "X coordinate must be between  [-4;4]")
-    private String x;
+    private Double x;
 
     @Min(value = -3, message = "Y coordinate must be between [-3;3]")
     @Max(value = 3, message = "Y coordinate must be between  [-3;3]")
-    @NotBlank(message = "Y coordinate can't be NULL")
-    private String y;
+    @NotNull(message = "Y coordinate can't be NULL")
+    private Double y;
 
     @Min(value = -4, message = "R coordinate must be between [-4;4]")
     @Max(value = 4, message = "R coordinate must be between  [-4;4]")
-    @NotBlank(message = "R coordinate can't be NULL")
-    private String r;
+    @NotNull(message = "R coordinate can't be NULL")
+    private Double r;
 }
