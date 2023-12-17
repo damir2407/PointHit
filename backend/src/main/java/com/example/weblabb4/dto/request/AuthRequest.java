@@ -1,4 +1,4 @@
-package com.example.weblabb4.requests;
+package com.example.weblabb4.dto.request;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

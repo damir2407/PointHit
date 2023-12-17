@@ -1,6 +1,9 @@
 package com.example.weblabb4.service;
 
 
+import com.example.weblabb4.config.jwt.JwtProvider;
+import com.example.weblabb4.dto.request.AuthRequest;
+import com.example.weblabb4.dto.request.RegistrationRequest;
 import com.example.weblabb4.entity.RoleEntity;
 import com.example.weblabb4.entity.UserEntity;
 import com.example.weblabb4.exception.UserAlreadyExistException;
@@ -19,16 +22,31 @@ public class UserService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserRepo userRepo, RoleRepo roleRepo, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepo userRepo, RoleRepo roleRepo, PasswordEncoder passwordEncoder, JwtProvider jwtProvider) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.passwordEncoder = passwordEncoder;
+        this.jwtProvider = jwtProvider;
+    }
+
+    public String authUser(AuthRequest authRequest) {
+        UserEntity userEntity = findByUsernameAndPassword(authRequest.getUsername(),
+            authRequest.getPassword());
+        return jwtProvider.generateToken(userEntity.getUsername());
+    }
+
+    public Long registerUser(RegistrationRequest registrationRequest) {
+        UserEntity user = new UserEntity();
+        user.setPassword(registrationRequest.getPassword());
+        user.setUsername(registrationRequest.getUsername());
+        return saveUser(user).getId();
     }
 
 
-    public void saveUser(UserEntity userEntity) throws UserAlreadyExistException {
+    private UserEntity saveUser(UserEntity userEntity) throws UserAlreadyExistException {
         log.info("Сохранение пользователя: " + userEntity.getUsername());
         if (userRepo.findByUsername(userEntity.getUsername()).isPresent()) {
             log.error("Пользователь с именем " + userEntity.getUsername() + " уже существует");
@@ -43,7 +61,7 @@ public class UserService {
         RoleEntity userRole = roleRepo.findByName("ROLE_USER").get();
         userEntity.setRoleEntity(userRole);
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-        userRepo.save(userEntity);
+        return userRepo.save(userEntity);
     }
 
 
